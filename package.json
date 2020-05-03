@@ -1,0 +1,28 @@
+{
+  "name": "oer-bookr-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --require 'dotenv/config' src/index.js",
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mark-halls/oer-bookr-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mark-halls/oer-bookr-api/issues"
+  },
+  "homepage": "https://github.com/mark-halls/oer-bookr-api#readme",
+  "dependencies": {
+    "@hapi/hapi": "^19.1.1",
+    "dotenv": "^8.2.0",
+    "knex": "^0.21.1"
+  },
+  "type": "module"
+}
