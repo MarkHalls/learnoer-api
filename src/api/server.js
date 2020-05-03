@@ -5,13 +5,12 @@ process.on("unhandledrejection", (err) => {
   process.exit(1);
 });
 
-const makeServer = () =>
-  Hapi.server({
+const makeServer = () => {
+  const server = Hapi.server({
     port: 3000,
     host: "localhost",
   });
 
-const router = (server) => {
   server.route({
     method: "GET",
     path: "/",
@@ -19,6 +18,8 @@ const router = (server) => {
       return "Hello World!";
     },
   });
+
+  return server;
 };
 
 const start = async (server) => {
