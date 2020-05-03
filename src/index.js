@@ -1,4 +1,5 @@
-import { makeServer, start } from "./api/server.js";
+import { makeServer, start, router } from "./api/server.js";
 
 const server = makeServer();
+router(server);
 start(server);

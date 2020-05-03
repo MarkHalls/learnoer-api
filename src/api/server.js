@@ -11,9 +11,19 @@ const makeServer = () =>
     host: "localhost",
   });
 
+const router = (server) => {
+  server.route({
+    method: "GET",
+    path: "/",
+    handler: (request, h) => {
+      return "Hello World!";
+    },
+  });
+};
+
 const start = async (server) => {
   await server.start();
   console.log(`Server running on ${server.info.uri}`);
 };
 
-export { makeServer, start };
+export { makeServer, start, router };
