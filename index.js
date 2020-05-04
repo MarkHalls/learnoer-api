@@ -1,5 +1,4 @@
-import { makeServer, start, router } from "./api/server.js";
+const { makeServer, start } = require("./api/server");
 
 const server = makeServer();
-router(server);
 start(server);

@@ -1,39 +1,43 @@
-// Update with your config settings.
+require("dotenv").config();
 
-module.exports = {
-  development: {
-    client: "sqlite3",
-    useNullAsDefault: true,
-    connection: {
-      filename: "./database/data.db3",
-    },
-    pool: {
-      afterCreate: (conn, done) => {
-        conn.run("PRAGMA foreign_keys = ON", done);
-      },
-    },
-    migrations: {
-      directory: "./database/migrations",
-    },
-    seeds: {
-      directory: "./database/seeds",
-    },
-    log: {
-      warn(message) {},
-      error(message) {},
-      deprecate(message) {},
-      debug(message) {},
-    },
+const config = {
+  client: process.env.DB_CLIENT,
+  connection: process.env.DB_URL,
+  migrations: {
+    directory: "./database/migrations",
   },
-
-  production: {
-    client: "pg",
-    connection: process.env.DATABASE_URL,
-    migrations: {
-      directory: "./database/migrations",
-    },
-    seeds: {
-      directory: "./database/seeds",
-    },
+  seeds: {
+    directory: "./database/seeds",
   },
 };
+
+if (process.env.DB_DEFAULT_NULL) {
+  config.useNullAsDefault = true;
+}
+
+if (process.env.DB_URL) {
+  config.connection = process.env.DB_URL;
+}
+
+if (process.env.DB_CLIENT === "sqlite") {
+  config.connection = {
+    filename: "./database/data.db3",
+  };
+  config.pool = {
+    afterCreate: (conn, done) => {
+      conn.run("PRAGMA foreign_keys = ON", done);
+    },
+  };
+}
+
+// use for sqlite
+if (process.env.DB_SUPPRESS_LOGS) {
+  config.log = {
+    warn(message) {},
+    error(message) {},
+    deprecate(message) {},
+    debug(message) {},
+  };
+}
+
+module.exports = config;

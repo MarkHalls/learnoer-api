@@ -1,4 +1,4 @@
-import Hapi from "@hapi/hapi";
+const Hapi = require("@hapi/hapi");
 
 process.on("unhandledrejection", (err) => {
   console.error(err);
@@ -27,4 +27,4 @@ const start = async (server) => {
   console.log(`Server running on ${server.info.uri}`);
 };
 
-export { makeServer, start, router };
+module.exports = { makeServer, start };

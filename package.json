@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --require 'dotenv/config' src/index.js",
-    "start": "node src/index.js",
+    "dev": "node --require 'dotenv/config' index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,7 +22,8 @@
   "dependencies": {
     "@hapi/hapi": "^19.1.1",
     "dotenv": "^8.2.0",
-    "knex": "^0.21.1"
-  },
-  "type": "module"
+    "knex": "^0.21.1",
+    "pg": "^8.0.3",
+    "sqlite3": "^4.2.0"
+  }
 }
