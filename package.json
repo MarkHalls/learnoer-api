@@ -21,9 +21,11 @@
   "homepage": "https://github.com/mark-halls/oer-bookr-api#readme",
   "dependencies": {
     "@hapi/hapi": "^19.1.1",
+    "axios": "^0.19.2",
     "dotenv": "^8.2.0",
     "knex": "^0.21.1",
     "pg": "^8.0.3",
-    "sqlite3": "^4.2.0"
+    "sqlite3": "^4.2.0",
+    "uuid": "^8.0.0"
   }
 }
