@@ -21,6 +21,7 @@
   "homepage": "https://github.com/mark-halls/oer-bookr-api#readme",
   "dependencies": {
     "@hapi/hapi": "^19.1.1",
+    "@hapi/wreck": "^17.0.0",
     "axios": "^0.19.2",
     "dotenv": "^8.2.0",
     "knex": "^0.21.1",
