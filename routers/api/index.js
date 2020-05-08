@@ -1,6 +1,6 @@
 // https://stackoverflow.com/a/57116514
 
-const books = require("./books");
+const search = require("./search");
 
 module.exports = {
   name: "api",
@@ -23,6 +23,6 @@ module.exports = {
       },
     ]);
 
-    server.register(books, { routes: { prefix: "/books" } });
+    server.register(search, { routes: { prefix: "/search" } });
   },
 };
