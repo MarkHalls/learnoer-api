@@ -1,9 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
-const axios = require("axios");
 
 const reviews = require("../../../database/models/reviews");
-
-const openLibSearch = "http://openlibrary.org/search.json?q=";
 
 module.exports = {
   name: "reviews",
@@ -11,7 +8,7 @@ module.exports = {
   async register(server) {
     server.route({
       method: "GET",
-      path: "/{key}",
+      path: "/{openlibrary_work}",
       handler: async (req, h) => {},
     });
 
@@ -23,7 +20,7 @@ module.exports = {
 
         const book = {
           id: uuidv4(),
-          key,
+          openlibrary_work,
           user_id: userId,
           body,
         };
