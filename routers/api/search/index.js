@@ -38,11 +38,11 @@ module.exports = {
 
         const books = await openLibClient.get(`search.json?${titleQuery}`);
 
-        const foundBook = books.payload.docs.filter(
+        const foundBooks = books.payload.docs.filter(
           (book) => book.availability.status === "borrow_available"
         );
 
-        return foundBook;
+        return foundBooks;
       },
     });
 
