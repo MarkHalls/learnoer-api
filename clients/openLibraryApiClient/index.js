@@ -46,10 +46,17 @@ const multiIsbnSearch = async (isbnArr) => {
   return payload;
 };
 
-const isbnSearch = async (isbn) => {
-  // http://localhost:3000/api/search/0716716437
+const searchByIsbn = async (isbn) => {
+  // testing url http://localhost:3000/api/search/0716716437
+  // multiple isbns http://localhost:3000/api/search/1850899576%7C0716716437
   const { payload } = await openLibReadApi.get(isbn);
+  const records = R.map(R.prop("records"));
+  const makeBooksArr = R.pipe(records, R.values, R.mergeAll, R.values);
 
+  return makeBooksArr(payload);
+};
+
+const filterAvailableBooks = (booksArr) => {
   const isRestricted = R.propEq("availability", "restricted");
   const isAvailable = R.complement(isRestricted);
   const hasAvailability = R.any(isAvailable);
@@ -60,23 +67,18 @@ const isbnSearch = async (isbn) => {
     hasAvailability
   );
 
-  const recordPath = R.path([isbn, "records"]);
-
-  const availableRecords = R.pickBy(recordHasAvailability, recordPath(payload));
+  const availableRecords = R.filter(recordHasAvailability, booksArr);
 
   const bookData = R.pluck("data", availableRecords);
 
-  const omitSubjects = R.over(
-    R.lensProp(R.head(R.keys(bookData))),
-    R.omit(["subjects"])
-  );
+  const omitSubjects = R.map(R.omit(["subjects"]));
 
   return omitSubjects(bookData);
 };
 
 module.exports = {
   textSearch,
-  isbnSearch,
+  isbnSearch: searchByIsbn,
   multiIsbnSearch,
 };
 
