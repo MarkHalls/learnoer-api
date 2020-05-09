@@ -1,3 +1,4 @@
+const R = require("ramda");
 const qs = require("querystring");
 const Wreck = require("@hapi/wreck");
 
@@ -46,29 +47,23 @@ const multiIsbnSearch = async (isbnArr) => {
 };
 
 const isbnSearch = async (isbn) => {
-  //we need to make 2 api calls to get the availability of the book to read
-  const isbnQuery = qs.stringify({
-    format: "json",
-    jscmd: "data",
-    bibkeys: `ISBN:${isbn}`,
-  });
+  const { payload } = await openLibReadApi.get(isbn);
 
-  const { payload } = await openLibApiClient.get(`books?${isbnQuery}`);
+  const validRecords = payload[isbn].records;
 
-  const checkCanRead = await multiIsbnSearch([isbn]);
+  const isRestricted = R.propEq("availability", "restricted");
+  const isAvailable = R.complement(isRestricted);
+  const hasAvailability = R.any(isAvailable);
 
-  const bookDetails = Object.entries(checkCanRead[isbn].records).map((book) =>
-    console.log(book[1].data.ebooks)
+  const recordHasAvailability = R.pipe(
+    R.path(["data", "ebooks"]),
+    R.defaultTo([]),
+    hasAvailability
   );
-  console.log(bookDetails);
-  return checkCanRead[isbn].records;
 
-  const isbnKey = `ISBN:${isbn}`;
+  const availableRecords = R.pickBy(recordHasAvailability, validRecords);
 
-  console.log(payload[isbnKey].title);
-  const foundBooks = textSearch(payload[isbnKey].title);
-
-  return foundBooks;
+  return availableRecords;
 };
 
 module.exports = {
@@ -76,3 +71,19 @@ module.exports = {
   isbnSearch,
   multiIsbnSearch,
 };
+
+// const isbnQuery = qs.stringify({
+//   format: "json",
+//   jscmd: "data",
+//   bibkeys: `ISBN:${isbn}`,
+// });
+
+// const { payload } = await openLibApiClient.get(`books?${isbnQuery}`);
+
+// return checkCanRead[isbn].records;
+
+// const isbnKey = `ISBN:${isbn}`;
+// const foundBooks = await textSearch(payload[isbnKey].title);
+// console.log(R.keys(foundBooks));
+// const moreFoundBooks = await multiIsbnSearch(R.keys(foundBooks));
+// console.log(moreFoundBooks);
