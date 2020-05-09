@@ -47,9 +47,8 @@ const multiIsbnSearch = async (isbnArr) => {
 };
 
 const isbnSearch = async (isbn) => {
+  // http://localhost:3000/api/search/0716716437
   const { payload } = await openLibReadApi.get(isbn);
-
-  const validRecords = payload[isbn].records;
 
   const isRestricted = R.propEq("availability", "restricted");
   const isAvailable = R.complement(isRestricted);
@@ -61,9 +60,18 @@ const isbnSearch = async (isbn) => {
     hasAvailability
   );
 
-  const availableRecords = R.pickBy(recordHasAvailability, validRecords);
+  const recordPath = R.path([isbn, "records"]);
 
-  return availableRecords;
+  const availableRecords = R.pickBy(recordHasAvailability, recordPath(payload));
+
+  const bookData = R.pluck("data", availableRecords);
+
+  const omitSubjects = R.over(
+    R.lensProp(R.head(R.keys(bookData))),
+    R.omit(["subjects"])
+  );
+
+  return omitSubjects(bookData);
 };
 
 module.exports = {
