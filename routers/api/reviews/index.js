@@ -29,7 +29,7 @@ module.exports = {
           const newBook = await reviews.add(book);
           return { newBook };
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       },
     });

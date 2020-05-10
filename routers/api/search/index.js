@@ -12,8 +12,6 @@ module.exports = {
       method: "GET",
       path: "/{term}",
       handler: async (req, h) => {
-        //TODO limit requests to 4094 characters
-        // test case for too large of a request
         // http://localhost:3000/api/search/9781285741550
 
         try {
@@ -37,9 +35,7 @@ module.exports = {
 
           return searchByIsbn([term]);
         } catch (err) {
-          console.error(err);
-          console.error(err.data.payload.toString());
-          console.error(err.data.res.req);
+          // console.error(err);
         }
       },
     });
