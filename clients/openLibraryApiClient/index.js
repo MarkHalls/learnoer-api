@@ -17,10 +17,8 @@ const openLibReadApi = Wreck.defaults({
   json: true,
 });
 
-const textSearch = async (searchTerm) => {
-  const searchString = qs.stringify({
-    title: searchTerm,
-  });
+const searchByTitle = async (title) => {
+  const searchString = qs.stringify({ title });
 
   const clientGet = (string) => openLibClient.get(string);
 
@@ -42,14 +40,21 @@ const textSearch = async (searchTerm) => {
   const availableIsbns = await getAvailableByIsbn(
     `search.json?${searchString}`
   );
+
   const booksCanRead = await searchByIsbn(availableIsbns);
+
   return booksCanRead;
 };
 
 const searchByIsbn = async (isbnArr) => {
   // testing url http://localhost:3000/api/search/0716716437
 
-  const { payload } = await openLibReadApi.get(R.join("|", isbnArr));
+  const { payload } = await openLibReadApi.get(
+    R.pipe(
+      R.map((isbn) => `isbn%3A${isbn}`),
+      R.join("|")
+    )(isbnArr)
+  );
   const records = R.map(R.prop("records"));
   const makeBooksArr = R.pipe(records, R.values, R.mergeAll, R.values);
 
@@ -77,7 +82,7 @@ const filterAvailableBooks = (booksArr) => {
 };
 
 module.exports = {
-  textSearch,
+  searchByTitle,
   searchByIsbn,
   filterAvailableBooks,
 };
