@@ -49,12 +49,7 @@ const searchByTitle = async (title) => {
 const searchByIsbn = async (isbnArr) => {
   // testing url http://localhost:3000/api/search/0716716437
 
-  const { payload } = await openLibReadApi.get(
-    R.pipe(
-      R.map((isbn) => `isbn%3A${isbn}`),
-      R.join("|")
-    )(isbnArr)
-  );
+  const { payload } = await openLibReadApi.get(R.join("|", isbnArr));
   const records = R.map(R.prop("records"));
   const makeBooksArr = R.pipe(records, R.values, R.mergeAll, R.values);
 

@@ -13,6 +13,8 @@ module.exports = {
       path: "/{term}",
       handler: async (req, h) => {
         //TODO limit requests to 4094 characters
+        // test case for too large of a request
+        // http://localhost:3000/api/search/9781285741550
 
         try {
           const { term } = req.params;
