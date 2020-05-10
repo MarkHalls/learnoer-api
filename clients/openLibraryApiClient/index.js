@@ -19,37 +19,37 @@ const openLibReadApi = Wreck.defaults({
 
 const textSearch = async (searchTerm) => {
   const searchString = qs.stringify({
-    q: searchTerm,
+    title: searchTerm,
   });
 
-  const searchResults = await openLibClient.get(`search.json?${searchString}`);
+  const clientGet = (string) => openLibClient.get(string);
 
-  const available = searchResults.payload.docs.filter(
-    (book) => book.availability.status !== "error"
+  const then = R.curry((fn, promise) => promise.then(fn));
+
+  const getAvailableByIsbn = R.pipe(
+    clientGet,
+    then(
+      R.pipe(
+        R.path(["payload", "docs"]),
+        R.defaultTo({}),
+        R.filter(R.complement(R.pathEq(["availability", "status"], "error"))),
+        R.pluck("isbn"),
+        R.flatten
+      )
+    )
   );
 
-  const availableIsbns = available.reduce((acc, book) => {
-    if (book.isbn) {
-      return [...acc, ...book.isbn];
-    }
-    return acc;
-  }, []);
-
-  const booksCanRead = await multiIsbnSearch(availableIsbns);
+  const availableIsbns = await getAvailableByIsbn(
+    `search.json?${searchString}`
+  );
+  const booksCanRead = await searchByIsbn(availableIsbns);
   return booksCanRead;
-  //   return available;
 };
 
-const multiIsbnSearch = async (isbnArr) => {
-  const query = isbnArr.join("|");
-  const { payload } = await openLibReadApi.get(query);
-  return payload;
-};
-
-const searchByIsbn = async (isbn) => {
+const searchByIsbn = async (isbnArr) => {
   // testing url http://localhost:3000/api/search/0716716437
-  // multiple isbns http://localhost:3000/api/search/1850899576%7C0716716437
-  const { payload } = await openLibReadApi.get(isbn);
+
+  const { payload } = await openLibReadApi.get(R.join("|", isbnArr));
   const records = R.map(R.prop("records"));
   const makeBooksArr = R.pipe(records, R.values, R.mergeAll, R.values);
 
@@ -78,22 +78,6 @@ const filterAvailableBooks = (booksArr) => {
 
 module.exports = {
   textSearch,
-  isbnSearch: searchByIsbn,
-  multiIsbnSearch,
+  searchByIsbn,
+  filterAvailableBooks,
 };
-
-// const isbnQuery = qs.stringify({
-//   format: "json",
-//   jscmd: "data",
-//   bibkeys: `ISBN:${isbn}`,
-// });
-
-// const { payload } = await openLibApiClient.get(`books?${isbnQuery}`);
-
-// return checkCanRead[isbn].records;
-
-// const isbnKey = `ISBN:${isbn}`;
-// const foundBooks = await textSearch(payload[isbnKey].title);
-// console.log(R.keys(foundBooks));
-// const moreFoundBooks = await multiIsbnSearch(R.keys(foundBooks));
-// console.log(moreFoundBooks);
