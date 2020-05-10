@@ -1,7 +1,7 @@
 const {
   textSearch,
-  isbnSearch,
-  isbnSearch2,
+  searchByIsbn,
+  filterAvailableBooks,
 } = require("../../../clients/openLibraryApiClient");
 
 module.exports = {
@@ -12,10 +12,22 @@ module.exports = {
       method: "GET",
       path: "/{isbn}",
       handler: async (req, h) => {
-        //we need to make 2 api calls to get the availability of the book to read
         const { isbn } = req.params;
 
-        return isbnSearch(isbn);
+        const foundBooks = await searchByIsbn([isbn]);
+
+        if (foundBooks.length === 0) {
+          return [];
+        }
+        const availableBooks = filterAvailableBooks(foundBooks);
+
+        if (availableBooks.length === 0) {
+          const relatedBooks = await textSearch(foundBooks[0].data.title);
+
+          return filterAvailableBooks(relatedBooks);
+        }
+
+        return searchByIsbn([isbn]);
       },
     });
 
@@ -23,7 +35,8 @@ module.exports = {
       method: "POST",
       path: "/",
       handler: async (req, h) => {
-        return textSearch(req.payload.searchTerm);
+        const availableBooks = await textSearch(req.payload.searchTerm);
+        return filterAvailableBooks(availableBooks);
       },
     });
   },
