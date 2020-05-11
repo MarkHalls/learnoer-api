@@ -1,5 +1,5 @@
 {
-  "name": "oer-bookr-api",
+  "name": "learnoer-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mark-halls/oer-bookr-api.git"
+    "url": "git+https://github.com/mark-halls/learnoer-api.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mark-halls/oer-bookr-api/issues"
+    "url": "https://github.com/mark-halls/learnoer-api/issues"
   },
-  "homepage": "https://github.com/mark-halls/oer-bookr-api#readme",
+  "homepage": "https://github.com/mark-halls/learnoer-api#readme",
   "dependencies": {
     "@hapi/hapi": "^19.1.1",
     "@hapi/wreck": "^17.0.0",
