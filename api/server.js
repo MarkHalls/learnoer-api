@@ -11,18 +11,15 @@ const makeServer = () => {
     host: "localhost",
   });
 
-  server.route({
-    method: "GET",
-    path: "/",
-    handler: (request, h) => {
-      return "Hello World!";
-    },
-  });
-
   return server;
 };
 
 const start = async (server) => {
+  //register all routes
+  await server.register(require("../routers/api/index"), {
+    routes: { prefix: "/api" },
+  });
+
   await server.start();
   console.log(`Server running on ${server.info.uri}`);
 };

@@ -1,13 +1,7 @@
 exports.up = function (knex) {
   return knex.schema.createTable("reviews", (reviews) => {
     reviews.string("id", 36).primary();
-    reviews
-      .uuid("book_id")
-      .notNullable()
-      .references("id")
-      .inTable("books")
-      .onUpdate("CASCADE")
-      .onDelete("CASCADE");
+    reviews.string("openlibrary_work", 256).notNullable();
     reviews
       .uuid("user_id")
       .notNullable()
@@ -16,7 +10,8 @@ exports.up = function (knex) {
       .onUpdate("CASCADE")
       .onDelete("CASCADE");
     reviews.text("display_name").unique();
-    reviews.unique(["book_id", "user_id"]);
+    reviews.unique(["openlibrary_work", "user_id"]);
+    reviews.text("body");
   });
 };
 

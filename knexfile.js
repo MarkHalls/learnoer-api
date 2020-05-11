@@ -2,7 +2,6 @@ require("dotenv").config();
 
 const config = {
   client: process.env.DB_CLIENT,
-  connection: process.env.DB_URL,
   migrations: {
     directory: "./database/migrations",
   },
