@@ -2,12 +2,25 @@ const {
   searchByTitle,
   searchByIsbn,
   filterAvailableBooks,
+  searchByOlid,
 } = require("../../../clients/openLibraryApiClient");
 
 module.exports = {
   name: "search",
 
   async register(server) {
+    server.route({
+      method: "GET",
+      path: "/olid/{olid}",
+      handler: async (req, h) => {
+        const { olid } = req.params;
+
+        const foundBook = await searchByOlid(olid);
+
+        return filterAvailableBooks(foundBook);
+      },
+    });
+
     server.route({
       method: "GET",
       path: "/{term}",
@@ -33,9 +46,9 @@ module.exports = {
             return filterAvailableBooks(relatedBooks);
           }
 
-          return searchByIsbn([term]);
+          return foundBooks;
         } catch (err) {
-          // console.error(err);
+          console.error(err);
         }
       },
     });

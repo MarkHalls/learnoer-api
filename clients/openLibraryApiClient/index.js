@@ -12,8 +12,13 @@ const openLibApiClient = Wreck.defaults({
   json: true,
 });
 
-const openLibReadApi = Wreck.defaults({
+const openLibReadApiMultiRequest = Wreck.defaults({
   baseUrl: "https://openlibrary.org/api/volumes/brief/json/",
+  json: true,
+});
+
+const openLibReadApiOlid = Wreck.defaults({
+  baseUrl: "https://openlibrary.org/api/volumes/brief/olid/",
   json: true,
 });
 
@@ -60,11 +65,22 @@ const searchByTitle = async (title) => {
 const searchByIsbn = async (isbnArr) => {
   // testing url http://localhost:3000/api/search/0716716437
 
-  const { payload } = await openLibReadApi.get(R.join("|", isbnArr));
+  const { payload } = await openLibReadApiMultiRequest.get(
+    R.join("|", isbnArr)
+  );
   const records = R.map(R.prop("records"));
   const makeBooksArr = R.pipe(records, R.values, R.mergeAll, R.values);
 
   return makeBooksArr(payload);
+};
+
+const searchByOlid = async (olid) => {
+  const { payload } = await openLibReadApiOlid.get(`${olid}.json`);
+
+  const records = R.prop("records");
+  const makeBookArr = R.pipe(records, R.values);
+
+  return makeBookArr(payload);
 };
 
 const filterAvailableBooks = (booksArr) => {
@@ -91,4 +107,5 @@ module.exports = {
   searchByTitle,
   searchByIsbn,
   filterAvailableBooks,
+  searchByOlid,
 };
