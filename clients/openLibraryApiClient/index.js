@@ -100,7 +100,7 @@ const filterAvailableBooks = (booksArr) => {
 
   const omitSubjects = R.map(R.omit(["subjects"]));
 
-  return omitSubjects(bookData);
+  return R.uniq(omitSubjects(bookData));
 };
 
 module.exports = {
