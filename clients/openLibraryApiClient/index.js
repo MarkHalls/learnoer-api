@@ -37,6 +37,7 @@ const searchByTitle = async (title) => {
         R.defaultTo({}),
         R.filter(R.complement(R.pathEq(["availability", "status"], "error"))),
         R.pluck("isbn"),
+        R.uniq,
         R.filter(R.identity),
         R.flatten
       )
@@ -47,19 +48,20 @@ const searchByTitle = async (title) => {
     `search.json?${searchString}`
   );
 
-  const splitAvailableIsbns = R.splitAt(260, availableIsbns);
+  const splitAvailableIsbns = R.splitEvery(260, availableIsbns);
 
   const completeCanReadList = [];
 
   for (const isbnGroup of splitAvailableIsbns) {
-    const booksCanRead = await searchByIsbn(isbnGroup);
-    completeCanReadList.push(booksCanRead);
+    try {
+      const booksCanRead = await searchByIsbn(isbnGroup);
+      completeCanReadList.push(booksCanRead);
+    } catch (error) {
+      console.error(error);
+    }
   }
+
   return R.flatten(completeCanReadList);
-
-  const booksCanRead = await searchByIsbn(availableIsbns);
-
-  return booksCanRead;
 };
 
 const searchByIsbn = async (isbnArr) => {
