@@ -15,6 +15,9 @@ const makeServer = () => {
       timeout: {
         server: 60000, //1 minute timeout
       },
+      payload: {
+        timeout: 60000, //1 minute timeout
+      },
     },
   });
 
