@@ -1,11 +1,12 @@
-const { v4: uuidv4 } = require("uuid");
+import { Server } from "@hapi/hapi";
+import { v4 as uuidv4 } from "uuid";
 
-const reviews = require("../../../database/models/reviews");
+import * as reviews from "../../../database/models/reviews";
 
-module.exports = {
+export default {
   name: "reviews",
 
-  async register(server) {
+  async register(server: Server) {
     server.route({
       method: "GET",
       path: "/{openlibrary_work}",

@@ -1,14 +1,16 @@
-const {
+import { Server } from "@hapi/hapi";
+
+import {
   searchByTitle,
   searchByIsbn,
   filterAvailableBooks,
   searchByOlid,
-} = require("../../../clients/openLibraryApiClient");
+} from "../../../clients/openLibraryApiClient";
 
-module.exports = {
+export default {
   name: "search",
 
-  async register(server) {
+  async register(server: Server) {
     server.route({
       method: "GET",
       path: "/olid/{olid}",

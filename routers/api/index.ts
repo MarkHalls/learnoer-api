@@ -1,11 +1,13 @@
 // https://stackoverflow.com/a/57116514
 
+import { Server } from "hapi";
+
 const search = require("./search");
 
-module.exports = {
+export default {
   name: "api",
 
-  async register(server) {
+  async register(server: Server) {
     server.route([
       {
         method: "GET",

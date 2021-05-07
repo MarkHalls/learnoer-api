@@ -1,11 +1,11 @@
-const Hapi = require("@hapi/hapi");
+import * as Hapi from "@hapi/hapi";
 
 process.on("unhandledrejection", (err) => {
   console.error(err);
   process.exit(1);
 });
 
-const makeServer = () => {
+export const makeServer = () => {
   const host = process.env.NODE_ENV === "production" ? "0.0.0.0" : "localhost";
   const server = Hapi.server({
     port: process.env.PORT || 3000,
@@ -18,7 +18,7 @@ const makeServer = () => {
   return server;
 };
 
-const start = async (server) => {
+export const start = async (server: Hapi.Server) => {
   //register all routes
   await server.register(require("../routers/api/index"), {
     routes: { prefix: "/api" },
@@ -27,5 +27,3 @@ const start = async (server) => {
   await server.start();
   console.log(`Server running on ${server.info.uri}`);
 };
-
-module.exports = { makeServer, start };
