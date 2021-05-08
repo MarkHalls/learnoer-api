@@ -2,6 +2,11 @@ import * as R from "ramda";
 import * as qs from "querystring";
 import * as Wreck from "@hapi/wreck";
 
+import { Book as Work } from "./book";
+
+// Maximum number of ISBNs a url string can hold when appended to api search
+const MAX_ISBN_COUNT = 260;
+
 const openLibClient = Wreck.defaults({
   baseUrl: "http://openlibrary.org/",
   json: true,
@@ -12,6 +17,7 @@ const openLibApiClient = Wreck.defaults({
   json: true,
 });
 
+// https://openlibrary.org/api/volumes/brief/json/0716716437
 const openLibReadApiMultiRequest = Wreck.defaults({
   baseUrl: "https://openlibrary.org/api/volumes/brief/json/",
   json: true,
@@ -26,20 +32,20 @@ export const searchByTitle = async (title: string) => {
   // http://openlibrary.org/search.json?title=dragonsong
   const searchString = qs.stringify({ title });
 
-  const { payload } = await openLibClient.get<Result>(
+  const { payload } = await openLibClient.get<Response>(
     `search.json?${searchString}`
   );
 
-  type Book = {
+  type IsbnBook = {
     isbn: string[];
   };
 
-  type Result = {
-    docs: Book[];
+  type Response = {
+    docs: IsbnBook[];
   };
 
-  const isAvailable = (result: Result) => {
-    const ebookList = R.path(["payload", "docs"], result) as Book[];
+  const extractIsbnList = (res: Response) => {
+    const ebookList = R.path(["payload", "docs"], res) as IsbnBook[];
 
     const isbnList = R.pluck("isbn", ebookList);
 
@@ -50,9 +56,12 @@ export const searchByTitle = async (title: string) => {
     return R.flatten(filterEmpty);
   };
 
-  const availableIsbnsFromSearch = isAvailable(payload);
+  const availableIsbnsFromSearch = extractIsbnList(payload);
 
-  const splitAvailableIsbns = R.splitEvery(260, availableIsbnsFromSearch);
+  const splitAvailableIsbns = R.splitEvery(
+    MAX_ISBN_COUNT,
+    availableIsbnsFromSearch
+  );
 
   const completeCanReadList = [];
 
@@ -71,6 +80,10 @@ export const searchByTitle = async (title: string) => {
 export const searchByIsbn = async (isbnArr: string[]) => {
   // testing url http://localhost:3000/api/search/0716716437
 
+  type IsbnRecord = {
+    [key: string]: Work[];
+  };
+
   const { payload } = await openLibReadApiMultiRequest.get<any>(
     R.join("|", isbnArr)
   );
@@ -79,7 +92,7 @@ export const searchByIsbn = async (isbnArr: string[]) => {
 
   const payloadRecords = records(payload);
 
-  const payloadValues = R.values(payloadRecords) as object[];
+  const payloadValues = R.values(payloadRecords) as any[];
 
   const payloadMergedValues = R.mergeAll(payloadValues);
 
@@ -93,22 +106,22 @@ export const searchByOlid = async (olid: string) => {
 
   const records = R.prop("records");
   const payloadRecords = records(payload) as object[];
-  return R.values(payloadRecords);
+  return R.values(payloadRecords) as object[];
 };
 
-export const filterAvailableBooks = (booksArr: []) => {
-  type Ebook = {
+export const filterAvailableBooks = (booksArr: any[]) => {
+  type LendableItem = {
     availability: string;
   };
 
-  type Book = {
-    data: { ebooks: Ebook[] };
+  type OpenLibraryBookResource = {
+    data: { ebooks: LendableItem[] };
   };
 
-  const isEbookAvailable = (book: Book) => {
-    const ebooksList = R.path(["data", "ebooks"], book) as Ebook[];
+  const isEbookAvailable = (book: OpenLibraryBookResource) => {
+    const ebooksList = R.path(["data", "ebooks"], book) as LendableItem[];
 
-    const isAvailable = (bookArr: Ebook[]) =>
+    const isAvailable = (bookArr: LendableItem[]) =>
       bookArr.some((book) => book.availability !== "restricted");
 
     return isAvailable(ebooksList ?? []);
