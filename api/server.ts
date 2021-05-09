@@ -1,4 +1,6 @@
-import * as Hapi from "@hapi/hapi";
+import Hapi from "@hapi/hapi";
+
+import { routes } from "../routers/api/index";
 
 process.on("unhandledrejection", (err) => {
   console.error(err);
@@ -20,7 +22,7 @@ export const makeServer = () => {
 
 export const start = async (server: Hapi.Server) => {
   //register all routes
-  await server.register(require("../routers/api/index"), {
+  await server.register(routes, {
     routes: { prefix: "/api" },
   });
 
