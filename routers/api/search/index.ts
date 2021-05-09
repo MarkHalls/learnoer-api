@@ -1,10 +1,9 @@
 import { Server } from "@hapi/hapi";
 
 import {
-  searchByTitle,
-  searchByIsbn,
-  filterAvailableBooks,
+  search,
   searchByOlid,
+  extractBookData,
 } from "../../../clients/openLibraryApiClient";
 
 export default {
@@ -19,39 +18,18 @@ export default {
 
         const foundBook = await searchByOlid(olid);
 
-        return filterAvailableBooks(foundBook);
+        return extractBookData(foundBook);
       },
     });
 
     server.route({
       method: "GET",
       path: "/{term}",
-      handler: async (req, h) => {
+      handler: (req, h) => {
         // http://localhost:3000/api/search/9781285741550
 
-        try {
-          const { term } = req.params;
-
-          const foundBooks = await searchByIsbn([term]);
-
-          if (foundBooks.length === 0) {
-            //assume the path was actually a title
-            const books = await searchByTitle(term);
-            return filterAvailableBooks(books);
-          }
-
-          const availableBooks = filterAvailableBooks(foundBooks);
-
-          if (availableBooks.length === 0) {
-            const relatedBooks = await searchByTitle(foundBooks[0].data.title);
-
-            return filterAvailableBooks(relatedBooks);
-          }
-
-          return foundBooks;
-        } catch (err) {
-          console.error(err);
-        }
+        const { term } = req.params;
+        return search(term);
       },
     });
   },

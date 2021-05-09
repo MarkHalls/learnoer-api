@@ -25,7 +25,6 @@
     "dotenv": "^8.2.0",
     "knex": "^0.21.1",
     "pg": "^8.0.3",
-    "ramda": "^0.27.0",
     "typescript": "^4.2.4",
     "uuid": "^8.0.0"
   },
@@ -34,7 +33,6 @@
     "@types/hapi__hapi": "^20.0.8",
     "@types/hapi__wreck": "^17.0.1",
     "@types/node": "^15.0.1",
-    "@types/ramda": "^0.27.40",
     "@types/uuid": "^8.3.0",
     "nodemon": "^2.0.3",
     "sqlite3": "^4.2.0"

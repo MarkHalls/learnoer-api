@@ -1,10 +1,10 @@
 // https://stackoverflow.com/a/57116514
 
-import { Server } from "hapi";
+import { Server, Plugin } from "@hapi/hapi";
 
-const search = require("./search");
+import search from "./search";
 
-export default {
+export const routes: Plugin<any> = {
   name: "api",
 
   async register(server: Server) {

@@ -1,6 +1,5 @@
-import * as R from "ramda";
 import * as qs from "querystring";
-import * as Wreck from "@hapi/wreck";
+import Wreck from "@hapi/wreck";
 
 import { Book as Work } from "./book";
 
@@ -32,106 +31,145 @@ export const searchByTitle = async (title: string) => {
   // http://openlibrary.org/search.json?title=dragonsong
   const searchString = qs.stringify({ title });
 
-  const { payload } = await openLibClient.get<Response>(
-    `search.json?${searchString}`
-  );
+  type Response = {
+    docs: IsbnBook[];
+  };
 
   type IsbnBook = {
     isbn: string[];
   };
 
-  type Response = {
-    docs: IsbnBook[];
-  };
+  const { payload } = await openLibClient.get<Response>(
+    `search.json?${searchString}`
+  );
 
-  const extractIsbnList = (res: Response) => {
-    const ebookList = R.path(["payload", "docs"], res) as IsbnBook[];
+  const extractIsbnList = (res: Response): string[] => {
+    const isbnList = res.docs.flatMap((x) => x.isbn);
 
-    const isbnList = R.pluck("isbn", ebookList);
-
-    const uniqueIsbnList = R.uniq(isbnList);
-
-    const filterEmpty = uniqueIsbnList.filter((x) => x);
-
-    return R.flatten(filterEmpty);
+    return [...new Set(isbnList)].filter((x) => x);
   };
 
   const availableIsbnsFromSearch = extractIsbnList(payload);
 
-  const splitAvailableIsbns = R.splitEvery(
-    MAX_ISBN_COUNT,
-    availableIsbnsFromSearch
-  );
+  const splitIsbnByMaxCount = [];
 
-  const completeCanReadList = [];
+  for (let i = 0; i < availableIsbnsFromSearch.length; i += MAX_ISBN_COUNT) {
+    splitIsbnByMaxCount.push(
+      availableIsbnsFromSearch.slice(i, i + MAX_ISBN_COUNT)
+    );
+  }
 
-  for (const isbnGroup of splitAvailableIsbns) {
+  const searchResults = [];
+
+  for (const isbnGroup of splitIsbnByMaxCount) {
     try {
-      const booksCanRead = await searchByIsbn(isbnGroup);
-      completeCanReadList.push(booksCanRead);
+      const bookList = await searchByIsbn(isbnGroup);
+      searchResults.push(...bookList);
     } catch (error) {
       console.error(error);
     }
   }
 
-  return R.flatten(completeCanReadList);
+  return searchResults;
 };
 
 export const searchByIsbn = async (isbnArr: string[]) => {
   // testing url http://localhost:3000/api/search/0716716437
 
-  type IsbnRecord = {
-    [key: string]: Work[];
+  type IsbnResponse = {
+    [isbn: string]: {
+      records: {
+        [olid: string]: OpenLibraryBookResource;
+      };
+    };
   };
 
-  const { payload } = await openLibReadApiMultiRequest.get<any>(
-    R.join("|", isbnArr)
+  const { payload } = await openLibReadApiMultiRequest.get<IsbnResponse>(
+    isbnArr.join("|")
   );
 
-  const records = R.map(R.prop("records"));
+  const payloadValues = Object.values(payload);
 
-  const payloadRecords = records(payload);
+  const recordsArr = payloadValues.map((x) => x.records);
 
-  const payloadValues = R.values(payloadRecords) as any[];
+  const records = recordsArr.reduce((acc, item) => ({ ...acc, ...item }));
 
-  const payloadMergedValues = R.mergeAll(payloadValues);
-
-  return R.values(payloadMergedValues);
+  return Object.values(records);
 };
 
 export const searchByOlid = async (olid: string) => {
   // https://openlibrary.org/api/volumes/brief/olid/OL22597358M.json
+  type OlidResponse = {
+    records: {
+      [olid: string]: OpenLibraryBookResource;
+    };
+  };
 
-  const { payload } = await openLibReadApiOlid.get<any>(`${olid}.json`);
+  const { payload } = await openLibReadApiOlid.get<OlidResponse>(
+    `${olid}.json`
+  );
 
-  const records = R.prop("records");
-  const payloadRecords = records(payload) as object[];
-  return R.values(payloadRecords) as object[];
+  return Object.values(payload.records);
 };
 
-export const filterAvailableBooks = (booksArr: any[]) => {
-  type LendableItem = {
-    availability: string;
+type LendableItem = {
+  availability: string;
+};
+
+type OpenLibraryBookResource = {
+  data: {
+    ebooks?: LendableItem[];
+    key: string;
+    title: string;
   };
+  details: {};
+  isbns: string[];
+};
 
-  type OpenLibraryBookResource = {
-    data: { ebooks: LendableItem[] };
-  };
+const hasAvailability = (book: OpenLibraryBookResource): boolean => {
+  return (book.data.ebooks ?? []).some(
+    (item) => item.availability !== "restricted"
+  );
+};
 
-  const isEbookAvailable = (book: OpenLibraryBookResource) => {
-    const ebooksList = R.path(["data", "ebooks"], book) as LendableItem[];
+export const extractBookData = (bookArr: OpenLibraryBookResource[]) => {
+  const dataArr = bookArr.map((book) => book.data);
 
-    const isAvailable = (bookArr: LendableItem[]) =>
-      bookArr.some((book) => book.availability !== "restricted");
+  return deduplicateBy((x) => x.key, dataArr);
+};
 
-    return isAvailable(ebooksList ?? []);
-  };
+const deduplicateBy = <T>(prop: (arg: T) => string, objects: T[]): T[] => {
+  const dict: { [key: string]: T } = {};
 
-  const availableRecords = R.filter(isEbookAvailable, booksArr);
+  for (const item of objects) {
+    const key = prop(item);
 
-  const bookData = R.pluck("data", availableRecords);
+    dict[key] = item;
+  }
 
-  const omitSubjects = R.map(R.omit(["subjects"]));
+  return Object.values(dict);
+};
 
-  return R.uniq(omitSubjects(bookData));
+export const search = async (term: string) => {
+  const foundBooks = await searchByIsbn([term]);
+
+  if (foundBooks.length === 0) {
+    //assume the path was actually a title
+    const books = await searchByTitle(term);
+    const available = books.filter(hasAvailability);
+
+    return extractBookData(available);
+  }
+
+  const availableBooks = foundBooks.filter(hasAvailability);
+
+  if (availableBooks.length === 0) {
+    const relatedBooks = await searchByTitle(foundBooks[0].data.title);
+
+    const available = relatedBooks.filter(hasAvailability);
+
+    return extractBookData(available);
+  }
+
+  return extractBookData(availableBooks);
 };
