@@ -1,6 +1,6 @@
-const db = require("../dbConfig");
+import { db } from "../dbConfig";
 
-const find = (id = undefined) => {
+export const find = (id?: string) => {
   const query = db("users");
   if (id) {
     query.where({ id }).first();
@@ -8,27 +8,27 @@ const find = (id = undefined) => {
   return query;
 };
 
-const add = async (user) => {
+type User = {
+  id: string;
+  email: string;
+  name: string;
+  display_name: string;
+};
+
+export const add = async (user: User) => {
   const [id] = await db("users").insert(user, "id");
   return db("users").where({ id }).first();
 };
 
-const remove = (id) => {
+export const remove = (id: string) => {
   return db("users").del().where({ id });
 };
 
-const update = async (user) => {
+export const update = async (user: User) => {
   const { id } = user;
   await db("users")
     .where({ id })
     .update({ ...user });
 
   return db("users").where({ id }).first();
-};
-
-module.exports = {
-  find,
-  add,
-  remove,
-  update,
 };

@@ -1,6 +1,9 @@
-require("dotenv").config();
+import { config as dotenvConfig } from "dotenv";
+import { Config } from "knex";
 
-const config = {
+dotenvConfig();
+
+export const config: Config = {
   client: process.env.DB_CLIENT,
   migrations: {
     directory: "./database/migrations",
@@ -23,7 +26,7 @@ if (process.env.DB_CLIENT === "sqlite") {
     filename: "./database/data.db3",
   };
   config.pool = {
-    afterCreate: (conn, done) => {
+    afterCreate: (conn: any, done: any) => {
       conn.run("PRAGMA foreign_keys = ON", done);
     },
   };
@@ -38,5 +41,3 @@ if (process.env.DB_SUPPRESS_LOGS) {
     debug(message) {},
   };
 }
-
-module.exports = config;

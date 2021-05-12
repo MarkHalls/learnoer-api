@@ -1,6 +1,6 @@
-const db = require("../dbConfig");
+import { db } from "../dbConfig";
 
-const find = (id = undefined) => {
+export const find = (id = undefined) => {
   const query = db("reviews");
   if (id) {
     query.where({ id }).first();
@@ -8,27 +8,28 @@ const find = (id = undefined) => {
   return query;
 };
 
-const add = async (review) => {
+type Review = {
+  id: string;
+  openlibrary_work: string;
+  user_id: string;
+  display_name: string;
+  body: string;
+};
+
+export const add = async (review: Review) => {
   const [id] = await db("reviews").insert(review, "id");
   return db("reviews").where({ id }).first();
 };
 
-const remove = (id) => {
+export const remove = (id: string) => {
   return db("reviews").del().where({ id });
 };
 
-const update = async (review) => {
+export const update = async (review: Review) => {
   const { id } = review;
   await db("reviews")
     .where({ id })
     .update({ ...review });
 
   return db("reviews").where({ id }).first();
-};
-
-module.exports = {
-  find,
-  add,
-  remove,
-  update,
 };
