@@ -1,9 +1,8 @@
 import { Server } from "@hapi/hapi";
 
 import {
-  search,
-  searchByOlid,
-  extractBookData,
+  getBooksByTitleOrIsbn,
+  getBooksByOlid,
 } from "../../../clients/openLibraryApiClient";
 
 export default {
@@ -16,9 +15,7 @@ export default {
       handler: async (req, h) => {
         const { olid } = req.params;
 
-        const foundBook = await searchByOlid(olid);
-
-        return extractBookData(foundBook);
+        return getBooksByOlid(olid);
       },
     });
 
@@ -29,7 +26,7 @@ export default {
         // http://localhost:3000/api/search/9781285741550
 
         const { term } = req.params;
-        return search(term);
+        return getBooksByTitleOrIsbn(term);
       },
     });
   },
