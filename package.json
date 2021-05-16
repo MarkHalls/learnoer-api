@@ -38,8 +38,7 @@
     "@types/hapi__wreck": "^17.0.1",
     "@types/node": "^15.0.1",
     "@types/uuid": "^8.3.0",
-    "nodemon": "^2.0.3",
-    "sqlite3": "^5.0.2"
+    "nodemon": "^2.0.3"
   },
   "engines": {
     "node": "14.x.x"
