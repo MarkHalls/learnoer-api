@@ -3,7 +3,7 @@ import { Config } from "knex";
 
 dotenvConfig();
 
-export const config: Config = {
+const config: Config = {
   client: process.env.DB_CLIENT,
   migrations: {
     directory: "./database/migrations",
@@ -41,3 +41,5 @@ if (process.env.DB_SUPPRESS_LOGS) {
     debug(message) {},
   };
 }
+
+module.exports = config;

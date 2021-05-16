@@ -8,7 +8,8 @@
     "start": "node dist/index.js",
     "start-local": "tsc && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "gcp-build": "tsc -p ."
+    "gcp-build": "tsc -p .",
+    "api-knex": "TS_NODE_COMPILER_OPTIONS='{ \"module\": \"commonjs\" }' knex --knexfile=./knexfile.ts"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,7 @@
     "dotenv": "^8.2.0",
     "knex": "^0.21.1",
     "pg": "^8.0.3",
+    "ts-node": "^9.1.1",
     "typescript": "^4.2.4",
     "uuid": "^8.0.0"
   },
@@ -36,7 +38,8 @@
     "@types/hapi__wreck": "^17.0.1",
     "@types/node": "^15.0.1",
     "@types/uuid": "^8.3.0",
-    "nodemon": "^2.0.3"
+    "nodemon": "^2.0.3",
+    "sqlite3": "^5.0.2"
   },
   "engines": {
     "node": "14.x.x"
