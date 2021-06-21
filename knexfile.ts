@@ -3,7 +3,7 @@ import { Config } from "knex";
 
 dotenvConfig();
 
-export const config: Config = {
+const config: Config = {
   client: process.env.DB_CLIENT,
   migrations: {
     directory: "./database/migrations",
@@ -18,26 +18,12 @@ if (process.env.DB_DEFAULT_NULL) {
 }
 
 if (process.env.DB_URL) {
-  config.connection = process.env.DB_URL;
-}
-
-if (process.env.DB_CLIENT === "sqlite") {
   config.connection = {
-    filename: "./database/data.db3",
-  };
-  config.pool = {
-    afterCreate: (conn: any, done: any) => {
-      conn.run("PRAGMA foreign_keys = ON", done);
-    },
+    host: process.env.DB_URL,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
   };
 }
 
-// use for sqlite
-if (process.env.DB_SUPPRESS_LOGS) {
-  config.log = {
-    warn(message) {},
-    error(message) {},
-    deprecate(message) {},
-    debug(message) {},
-  };
-}
+module.exports = config;
