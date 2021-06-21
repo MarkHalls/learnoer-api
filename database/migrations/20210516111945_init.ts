@@ -8,8 +8,8 @@ export async function up(knex: Knex): Promise<any> {
     users.text("login_type").notNullable();
   });
 
-  await knex.schema.createTable("user_google", (users) => {
-    users
+  await knex.schema.createTable("user_google", (gUsers) => {
+    gUsers
       .uuid("user_id")
       .notNullable()
       .references("id")
@@ -17,11 +17,11 @@ export async function up(knex: Knex): Promise<any> {
       .onUpdate("CASCADE")
       .onDelete("CASCADE")
       .primary();
-    users.text("openid").notNullable();
+    gUsers.text("openid").notNullable();
   });
 
-  await knex.schema.createTable("user_internal", (users) => {
-    users
+  await knex.schema.createTable("user_internal", (iUsers) => {
+    iUsers
       .uuid("user_id")
       .notNullable()
       .references("id")
@@ -29,13 +29,13 @@ export async function up(knex: Knex): Promise<any> {
       .onUpdate("CASCADE")
       .onDelete("CASCADE")
       .primary();
-    users.text("password").notNullable();
-    users.text("profile_img");
+    iUsers.text("password").notNullable();
+    iUsers.text("profile_img");
   });
 
-  await knex.schema.createTable("works", (users) => {
-    users.uuid("id").primary();
-    users.text("olid").notNullable();
+  await knex.schema.createTable("works", (works) => {
+    works.uuid("id").primary();
+    works.text("olid").notNullable();
   });
 
   await knex.schema.createTable("reviews", (reviews) => {
