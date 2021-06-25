@@ -1,30 +1,12 @@
-// https://stackoverflow.com/a/57116514
+import { Router } from "express";
 
-import { Server, Plugin } from "@hapi/hapi";
+import searchRouter from "./search";
+import userRouter from "./users";
 
-import search from "./search";
+const router = Router();
 
-export const routes: Plugin<any> = {
-  name: "api",
+router.use("/search", searchRouter);
+router.use("/user", userRouter);
+router.get("/", (_, res) => res.status(200).json({ body: "Hello World" }));
 
-  async register(server: Server) {
-    server.route([
-      {
-        method: "GET",
-        path: "/",
-        handler: async (req, h) => {
-          return "Hello World";
-        },
-      },
-      {
-        method: "*",
-        path: "/{p*}",
-        handler: (req, h) => {
-          return "Hello my baby, hello my honey";
-        },
-      },
-    ]);
-
-    server.register(search, { routes: { prefix: "/search" } });
-  },
-};
+export default router;

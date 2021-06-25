@@ -14,11 +14,11 @@ export const searchByIsbn = async (
     };
   };
 
-  const { payload } = await openLibReadApiMultiRequest.get<IsbnResponse>(
+  const { body } = await openLibReadApiMultiRequest.get<IsbnResponse>(
     isbnArr.join("|")
   );
 
-  const payloadValues = Object.values(payload);
+  const payloadValues = Object.values(body);
 
   const recordsArr = payloadValues.map((x) => x.records);
 

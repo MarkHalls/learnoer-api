@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --require 'dotenv/config' index.js",
     "start": "node dist/index.js",
-    "start-local": "tsc && node dist/index.js",
+    "dev": "tsc && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "gcp-build": "tsc -p .",
     "api-knex": "TS_NODE_COMPILER_OPTIONS='{ \"module\": \"commonjs\" }' knex --knexfile=./knexfile.ts"
@@ -23,19 +22,19 @@
   },
   "homepage": "https://github.com/mark-halls/learnoer-api#readme",
   "dependencies": {
-    "@hapi/hapi": "^19.1.1",
-    "@hapi/wreck": "^17.0.0",
     "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "got": "^11.8.2",
+    "helmet": "^4.6.0",
     "knex": "^0.21.1",
+    "nanoid": "^3.1.23",
     "pg": "^8.0.3",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.4",
     "uuid": "^8.0.0"
   },
   "devDependencies": {
-    "@types/hapi": "^18.0.5",
-    "@types/hapi__hapi": "^20.0.8",
-    "@types/hapi__wreck": "^17.0.1",
+    "@types/express": "^4.17.12",
     "@types/node": "^15.0.1",
     "@types/uuid": "^8.3.0",
     "nodemon": "^2.0.3"

@@ -22,7 +22,7 @@ export const searchByTitle = async (
     isbn: string[];
   };
 
-  const { payload } = await openLibClient.get<Response>(
+  const { body } = await openLibClient.get<Response>(
     `search.json?${searchString}`
   );
 
@@ -32,7 +32,7 @@ export const searchByTitle = async (
     return [...new Set(isbnList)].filter((x) => x);
   };
 
-  const availableIsbnsFromSearch = extractIsbnList(payload);
+  const availableIsbnsFromSearch = extractIsbnList(body);
 
   const splitIsbnByMaxCount = [];
 
