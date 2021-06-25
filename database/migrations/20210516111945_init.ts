@@ -2,15 +2,15 @@ import * as Knex from "knex";
 
 export async function up(knex: Knex): Promise<any> {
   await knex.schema.createTable("users", (users) => {
-    users.uuid("id").primary();
-    users.text("email").notNullable();
-    users.text("display_name").notNullable();
+    users.text("id").primary();
+    users.text("email").unique().notNullable();
+    users.text("display_name").unique().notNullable();
     users.text("login_type").notNullable();
   });
 
   await knex.schema.createTable("user_google", (gUsers) => {
     gUsers
-      .uuid("user_id")
+      .text("user_id")
       .notNullable()
       .references("id")
       .inTable("users")
@@ -22,7 +22,7 @@ export async function up(knex: Knex): Promise<any> {
 
   await knex.schema.createTable("user_internal", (iUsers) => {
     iUsers
-      .uuid("user_id")
+      .text("user_id")
       .notNullable()
       .references("id")
       .inTable("users")
@@ -34,21 +34,21 @@ export async function up(knex: Knex): Promise<any> {
   });
 
   await knex.schema.createTable("works", (works) => {
-    works.uuid("id").primary();
+    works.text("id").primary();
     works.text("olid").notNullable();
   });
 
   await knex.schema.createTable("reviews", (reviews) => {
-    reviews.uuid("id").primary();
+    reviews.text("id").primary();
     reviews
-      .uuid("user_id")
+      .text("user_id")
       .notNullable()
       .references("id")
       .inTable("users")
       .onUpdate("CASCADE")
       .onDelete("CASCADE");
     reviews
-      .uuid("work_id")
+      .text("work_id")
       .notNullable()
       .references("id")
       .inTable("works")
@@ -61,9 +61,9 @@ export async function up(knex: Knex): Promise<any> {
   });
 
   await knex.schema.createTable("works_lists", (worksLists) => {
-    worksLists.uuid("id").primary();
+    worksLists.text("id").primary();
     worksLists
-      .uuid("user_id")
+      .text("user_id")
       .notNullable()
       .references("id")
       .inTable("users")
@@ -74,14 +74,14 @@ export async function up(knex: Knex): Promise<any> {
 
   await knex.schema.createTable("works_lists_works", (worksListsWorks) => {
     worksListsWorks
-      .uuid("works_list_id")
+      .text("works_list_id")
       .notNullable()
       .references("id")
       .inTable("works_lists")
       .onUpdate("CASCADE")
       .onDelete("CASCADE");
     worksListsWorks
-      .uuid("work_id")
+      .text("work_id")
       .notNullable()
       .references("id")
       .inTable("works")
@@ -93,7 +93,7 @@ export async function up(knex: Knex): Promise<any> {
 
   await knex.schema.createTable("works_tags", (worksTags) => {
     worksTags
-      .uuid("work_id")
+      .text("work_id")
       .notNullable()
       .references("id")
       .inTable("works")

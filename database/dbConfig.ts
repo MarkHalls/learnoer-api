@@ -1,4 +1,4 @@
 import knex from "knex";
-import { config } from "../knexfile";
+import config = require("../knexfile");
 
 export const db = knex(config);
