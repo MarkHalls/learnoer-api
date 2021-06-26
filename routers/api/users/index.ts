@@ -41,9 +41,13 @@ const signToken = (payload: { user: UserResource }) => {
 const router = Router();
 
 router.get("/all", async (req: Request, res: Response) => {
-  const users = await allUsers();
-
-  res.status(200).json(users);
+  try {
+    const users = await allUsers();
+    const resource = users.map((user) => UserResourceFromUser(user));
+    res.status(200).json(resource);
+  } catch (err) {
+    res.status(404).end();
+  }
 });
 
 router.get("/:id", async (req: Request, res: Response) => {

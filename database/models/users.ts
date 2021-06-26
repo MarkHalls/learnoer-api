@@ -74,18 +74,24 @@ const userRecordFromUser = (user: User): UserRecord => {
 
   return userRecord;
 };
-const expectUserRecord = (userRecord: unknown): void => {
+const expectUserRecord = (userRecord: unknown): void | boolean => {
   if (!isUserRecord(userRecord)) {
     throw new Error("Value is not a valid UserRecord");
   }
+  return true;
 };
 
-export const allUsers = async (): Promise<UserRecord[]> => {
-  const userRecord = await db("users")
+export const allUsers = async (): Promise<User[]> => {
+  const userRecords = await db("users")
     .leftJoin("user_google", { "users.id": "user_google.user_id" })
     .leftJoin("user_internal", { "users.id": "user_internal.user_id" });
-  expectUserRecord(userRecord);
-  return userRecord;
+
+  const filterUserRecords = userRecords.filter((user) =>
+    expectUserRecord(user)
+  );
+
+  const users = filterUserRecords.map((user) => userFromRecord(user));
+  return users;
 };
 
 export const findUserById = async (id: string): Promise<User> => {
