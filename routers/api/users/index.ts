@@ -52,9 +52,13 @@ router.get("/all", async (req: Request, res: Response) => {
 
 router.get("/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
-  const user = await findUserById(id);
-
-  res.status(200).json(user);
+  try {
+    const user = await findUserById(id);
+    const resource = UserResourceFromUser(user);
+    res.status(200).json(resource);
+  } catch (err) {
+    res.status(404).end();
+  }
 });
 
 router.delete("/:id", async (req: Request, res: Response) => {
@@ -65,7 +69,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
     res.status(200).end();
   } catch (err) {
     res.status(500).json(err);
-  }
+  } 
 });
 
 router.post("/", checkUserAlreadyExist, async (req: Request, res: Response) => {
