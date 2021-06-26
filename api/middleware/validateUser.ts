@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
 
-export const validateUser = (
+export const validateUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  req.user = req.body;
-  next();
+  const user = req.user;
 };

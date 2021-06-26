@@ -1,13 +1,42 @@
 import { Router, Request, Response } from "express";
 import { nanoid } from "nanoid";
+import bcrypt from "bcryptjs";
+import jwt, { Secret } from "jsonwebtoken";
 
-import { validateUser } from "../../../api/middleware";
+import { checkUserAlreadyExist } from "../../../api/middleware/checkUserExist";
 import {
   allUsers,
   findUserById,
   addUser,
   removeUser,
 } from "../../../database/models/users";
+import { User } from "./domain/User";
+
+type UserResource = {
+  id: string;
+  email: string;
+  display_name: string;
+  profile_img: string | null;
+};
+
+const UserResourceFromUser = (user: User): UserResource => {
+  const userResource: UserResource = {
+    id: user.id,
+    email: user.email,
+    display_name: user.display_name,
+    profile_img: user.profile_img,
+  };
+
+  return userResource;
+};
+
+const signToken = (payload: { user: UserResource }) => {
+  const secret: Secret = process.env.SECRET || "";
+
+  return jwt.sign(payload, secret, {
+    expiresIn: "1h",
+  });
+};
 
 const router = Router();
 
@@ -35,12 +64,19 @@ router.delete("/:id", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/", validateUser, async (req: Request, res: Response) => {
+router.post("/", checkUserAlreadyExist, async (req: Request, res: Response) => {
   try {
     req.user.id = nanoid();
+    if (req.user.password) {
+      req.user.password = bcrypt.hashSync(req.user.password, 10);
+    }
     await addUser(req.user);
+    const user = await findUserById(req.user.id);
+    const resource = UserResourceFromUser(user);
 
-    res.status(201).end();
+    const token = signToken({ user: resource });
+
+    res.status(201).json({ token, user: resource });
   } catch (err) {
     res.status(500).json(err);
   }
