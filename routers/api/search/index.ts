@@ -1,33 +1,23 @@
-import { Server } from "@hapi/hapi";
+import { Router } from "express";
 
 import {
   getBooksByTitleOrIsbn,
   getBooksByOlid,
 } from "../../../clients/openLibraryApiClient";
 
-export default {
-  name: "search",
+const router = Router();
 
-  async register(server: Server) {
-    server.route({
-      method: "GET",
-      path: "/olid/{olid}",
-      handler: async (req, h) => {
-        const { olid } = req.params;
+router.get("/olid/:olid", async (req, res) => {
+  const { olid } = req.params;
+  const works = await getBooksByOlid(olid);
+  res.status(200).json(works);
+});
 
-        return getBooksByOlid(olid);
-      },
-    });
+router.get("/:term", async (req, res) => {
+  // http://localhost:3000/api/search/9781285741550
+  const { term } = req.params;
+  const works = await getBooksByTitleOrIsbn(term);
+  res.status(200).json(works);
+});
 
-    server.route({
-      method: "GET",
-      path: "/{term}",
-      handler: (req, h) => {
-        // http://localhost:3000/api/search/9781285741550
-
-        const { term } = req.params;
-        return getBooksByTitleOrIsbn(term);
-      },
-    });
-  },
-};
+export default router;

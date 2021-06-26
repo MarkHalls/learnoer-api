@@ -1,31 +1,15 @@
-import Hapi from "@hapi/hapi";
+import express from "express";
+import helmet from "helmet";
 
-import { routes } from "../routers/api/index";
+import { logger } from "./middleware";
 
-process.on("unhandledrejection", (err) => {
-  console.error(err);
-  process.exit(1);
-});
+import routers from "../routers/api";
 
-export const makeServer = () => {
-  const host = process.env.NODE_ENV === "production" ? "0.0.0.0" : "localhost";
-  const server = Hapi.server({
-    port: process.env.PORT || 3000,
-    host,
-    routes: {
-      cors: { origin: "ignore" },
-    },
-  });
+const server = express();
 
-  return server;
-};
+server.use(helmet());
+server.use(logger);
+server.use(express.json());
+server.use("/api", routers);
 
-export const start = async (server: Hapi.Server) => {
-  //register all routes
-  await server.register(routes, {
-    routes: { prefix: "/api" },
-  });
-
-  await server.start();
-  console.log(`Server running on ${server.info.uri}`);
-};
+export { server };

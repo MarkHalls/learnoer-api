@@ -9,9 +9,7 @@ export const searchByOlid = async (olid: string) => {
     };
   };
 
-  const { payload } = await openLibReadApiOlid.get<OlidResponse>(
-    `${olid}.json`
-  );
+  const { body } = await openLibReadApiOlid.get<OlidResponse>(`${olid}.json`);
 
-  return Object.values(payload.records);
+  return Object.values(body.records);
 };

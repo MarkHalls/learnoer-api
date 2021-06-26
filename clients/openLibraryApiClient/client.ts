@@ -1,22 +1,22 @@
-import Wreck from "@hapi/wreck";
+import got from "got";
 
-export const openLibClient = Wreck.defaults({
-  baseUrl: "http://openlibrary.org/",
-  json: true,
+export const openLibClient = got.extend({
+  prefixUrl: "https://openlibrary.org/",
+  responseType: "json",
 });
 
-export const openLibApiClient = Wreck.defaults({
-  baseUrl: "https://openlibrary.org/api/",
-  json: true,
+export const openLibApiClient = got.extend({
+  prefixUrl: "https://openlibrary.org/api/",
+  responseType: "json",
 });
 
 // https://openlibrary.org/api/volumes/brief/json/0716716437
-export const openLibReadApiMultiRequest = Wreck.defaults({
-  baseUrl: "https://openlibrary.org/api/volumes/brief/json/",
-  json: true,
+export const openLibReadApiMultiRequest = got.extend({
+  prefixUrl: "https://openlibrary.org/api/volumes/brief/json/",
+  responseType: "json",
 });
 
-export const openLibReadApiOlid = Wreck.defaults({
-  baseUrl: "https://openlibrary.org/api/volumes/brief/olid/",
-  json: true,
+export const openLibReadApiOlid = got.extend({
+  prefixUrl: "https://openlibrary.org/api/volumes/brief/olid/",
+  responseType: "json",
 });
