@@ -6,6 +6,7 @@ export async function up(knex: Knex): Promise<any> {
     users.text("email").unique().notNullable();
     users.text("display_name").unique().notNullable();
     users.text("login_type").notNullable();
+    users.text("profile_img");
   });
 
   await knex.schema.createTable("user_google", (gUsers) => {
@@ -30,7 +31,6 @@ export async function up(knex: Knex): Promise<any> {
       .onDelete("CASCADE")
       .primary();
     iUsers.text("password").notNullable();
-    iUsers.text("profile_img");
   });
 
   await knex.schema.createTable("works", (works) => {
