@@ -1,2 +1,1 @@
-web: npm i
-web: npm run start
+web: npm start
